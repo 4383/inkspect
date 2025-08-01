@@ -113,6 +113,29 @@ Runs the interactive setup to create your configuration file.
 inkspect setup
 ```
 
+## Piping and Integration
+
+`inkspect` is a standard command-line application, which means it can be seamlessly integrated into your existing scripts and workflows using pipes. You can chain the output of `inkspect` into other tools for further processing.
+
+This is especially powerful when using the `code-agent-spec` or `code-gen` styles. You can generate a detailed specification or a block of code and pipe it directly to another AI agent or a file.
+
+### Example: Generating a Spec and Piping it to a Coding Agent
+
+In this example, we'll use `inkspect` with the `code-agent-spec` style to generate a detailed TDD specification for a Python script.
+Then, we'll pipe that specification directly to the official Google `gemini-cli` tool ([https://github.com/google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)) to generate the final code.
+
+```bash
+# Generate the spec with inkspect and pipe it directly to the gemini-cli agent
+inkspect optimize --style code-agent-spec --input "create a python script to fetch and display the weather for a given city" | gemini -
+
+# You could also save the spec to a file first
+inkspect optimize --style code-agent-spec --input "create a python script..." --output spec.md
+cat spec.md | gemini -
+```
+
+This workflow allows you to use `inkspect` as a powerful "front-end" for generating high-quality, structured prompts for other automated systems, all from the comfort of your terminal.
+The above example would work the same with [Claude Code](https://www.anthropic.com/claude-code).
+
 ### The System Prompt
 
 To ensure that the LLM's output is clean and direct, `inkspect` uses a **system prompt** by default. This is a set of instructions that is automatically prepended to every request sent to the LLM. It tells the model to avoid conversational filler like "Of course, here is..." and concluding remarks.
