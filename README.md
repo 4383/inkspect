@@ -4,7 +4,9 @@
 ![Crates.io Version](https://img.shields.io/crates/v/inkspect)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/inkspect)
 
-`inkspect` is a powerful CLI tool for refining and generating text and code using Large Language Models (LLMs). It's designed to streamline your prompting workflow, keeping you in your terminal and integrated with your favorite tools.
+Inkspect is a command-line interface (CLI) tool that streamlines your workflow with Large Language Models (LLMs) by integrating prompt refinement and generation directly into your favorite code editor and into your terminal pipelines. One of its main strengths lies in its embedded prompts, which are pre-defined query templates that help you get precise results without having to write complex instructions every time.
+
+For example, instead of writing a lengthy description to generate code, you can use a style like code-spec to quickly create a detailed, TDD-focused specification, or code-debug to get debugging suggestions for a generic bug. These pre-defined prompts save time, ensure better consistency in the results, and make using LLMs more efficient for specific development tasks.
 
 ## The Motivation: Stop Juggling, Start Creating
 
