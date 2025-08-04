@@ -132,11 +132,7 @@ Then, we'll pipe that specification directly to the official Google `gemini-cli`
 
 ```bash
 # Generate the spec with inkspect and pipe it directly to the gemini-cli agent
-inkspect optimize --style code-spec --input "create a python script to fetch and display the weather for a given city" | gemini -
-
-# You could also save the spec to a file first
-inkspect optimize --style code-spec --input "create a python script..." --output spec.md
-cat spec.md | gemini -
+inkspect optimize --style code-spec --input "create a python script to fetch and display the weather for a given city" -o specs.md && gemini -p "execute the @specs.md file"
 ```
 
 This workflow allows you to use `inkspect` as a powerful "front-end" for generating high-quality, structured prompts for other automated systems, all from the comfort of your terminal.
