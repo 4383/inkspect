@@ -123,19 +123,19 @@ inkspect setup
 
 `inkspect` is a standard command-line application, which means it can be seamlessly integrated into your existing scripts and workflows using pipes. You can chain the output of `inkspect` into other tools for further processing.
 
-This is especially powerful when using the `code-agent-spec` or `code-gen` styles. You can generate a detailed specification or a block of code and pipe it directly to another AI agent or a file.
+This is especially powerful when using the `code-spec` or `code-gen` styles. You can generate a detailed specification or a block of code and pipe it directly to another AI agent or a file.
 
 ### Example: Generating a Spec and Piping it to a Coding Agent
 
-In this example, we'll use `inkspect` with the `code-agent-spec` style to generate a detailed TDD specification for a Python script.
+In this example, we'll use `inkspect` with the `code-spec` style to generate a detailed TDD specification for a Python script.
 Then, we'll pipe that specification directly to the official Google `gemini-cli` tool ([https://github.com/google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)) to generate the final code.
 
 ```bash
 # Generate the spec with inkspect and pipe it directly to the gemini-cli agent
-inkspect optimize --style code-agent-spec --input "create a python script to fetch and display the weather for a given city" | gemini -
+inkspect optimize --style code-spec --input "create a python script to fetch and display the weather for a given city" | gemini -
 
 # You could also save the spec to a file first
-inkspect optimize --style code-agent-spec --input "create a python script..." --output spec.md
+inkspect optimize --style code-spec --input "create a python script..." --output spec.md
 cat spec.md | gemini -
 ```
 
