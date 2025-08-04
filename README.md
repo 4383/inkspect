@@ -1,6 +1,6 @@
 # inkspect
 
-[![Rust](https://github.com/4383/decode/actions/workflows/rust.yml/badge.svg)](https://github.com/4383/decode/actions/workflows/rust.yml)
+[![Rust](https://github.com/4383/inkspect/actions/workflows/rust.yml/badge.svg)](https://github.com/4383/inkspect/actions/workflows/rust.yml)
 ![Crates.io Version](https://img.shields.io/crates/v/inkspect)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/inkspect)
 
