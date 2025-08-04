@@ -1,5 +1,9 @@
 # inkspect
 
+[![Rust](https://github.com/4383/decode/actions/workflows/rust.yml/badge.svg)](https://github.com/4383/decode/actions/workflows/rust.yml)
+![Crates.io Version](https://img.shields.io/crates/v/inkspect)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/inkspect)
+
 `inkspect` is a powerful CLI tool for refining and generating text and code using Large Language Models (LLMs). It's designed to streamline your prompting workflow, keeping you in your terminal and integrated with your favorite tools.
 
 ## The Motivation: Stop Juggling, Start Creating
@@ -44,7 +48,7 @@ If you want to build the latest development version, you can build it from the s
 1.  **Install Rust:** If you don't already have it, install the Rust toolchain from [rust-lang.org](https://www.rust-lang.org/tools/install).
 2.  **Clone and Build:**
     ```bash
-    git clone https://github.com/your-repo/inkspect.git
+    git clone https://github.com/4383/inkspect.git
     cd inkspect
     cargo build --release
     ```
@@ -89,12 +93,12 @@ This is the main command for processing text with an LLM.
     inkspect optimize --input "your prompt here" --output my_file.txt
     ```
 
-#### `list-styles`
+#### `list-prompts`
 
 Lists all the available prompt styles from your configuration file.
 
 ```bash
-inkspect list-styles
+inkspect list-prompts
 ```
 
 #### `list-models`
@@ -152,48 +156,15 @@ inkspect optimize --input "Tell me a short story." --no-system-prompt
 
 ### Prompt Styles (`--style`)
 
-This is where the power of `inkspect` comes in. Use the `--style` flag with the `optimize` command to transform your input in different ways.
+This is where the power of `inkspect` comes in. Use the `--style` flag with the `optimize` command to transform your input in different ways. You can also provide a custom prompt directly with the `--prompt` flag.
 
-#### `refine` (Default)
-
-Improves the clarity, specificity, and overall quality of your text.
-
-*   **Example:**
-    ```bash
-    inkspect optimize --style refine --input "what is rust?"
-    ```
-*   **Sample Output:**
-    > Rust is a modern systems programming language focused on performance, reliability, and productivity. It achieves the raw speed of C++ but with powerful compile-time guarantees that prevent common memory bugs.
-
-#### `simplify`
-
-Makes complex topics easier to understand.
-
-*   **Example:**
-    ```bash
-    inkspect optimize --style simplify --input "Explain quantum computing in simple terms."
-    ```
-*   **Sample Output:**
-    > Imagine a regular computer bit is a light switch that can be either on (1) or off (0). A quantum bit (qubit) is like a dimmer switch; it can be on, off, or somewhere in between, all at the same time. This "in-between" state lets quantum computers explore many possibilities at once, making them incredibly powerful for solving certain types of complex problems.
-
-#### `boost_engagement`
-
-Rewrites text to be more engaging and suitable for social media.
-
-*   **Example:**
-    ```bash
-    inkspect optimize --style boost_engagement --input "Our new app is now available for download."
-    ```
-*   **Sample Output:**
-    > 🔥 BIG NEWS! 🔥 Our brand new app has officially dropped! 🚀 Download it now and experience the future. You don't want to miss this! #NewApp #LaunchDay #Tech
-
-#### `code-agent-spec`
+#### `code-spec` (Default)
 
 Transforms a high-level feature request into a detailed, TDD-focused specification for an AI coding agent. **This does not write code, just specs.**
 
 *   **Example:**
     ```bash
-    inkspect optimize --style code-agent-spec --input "I want to create a simple command-line todo list app in Rust"
+    inkspect optimize --style code-spec --input "I want to create a simple command-line todo list app in Rust"
     ```
 *   **Sample Output:**
     > ### 1. High-Level Goal
@@ -235,3 +206,36 @@ Generates a complete, single-file application from a high-level description.
     > 2.  **Add dependencies** to `Cargo.toml`: `clap`, `serde`, `serde_json`.
     > 3.  **Run** `cargo build --release`.
     > 4.  **Execute** `./target/release/todo-cli add "My first task"`.
+
+#### `code-debug`
+
+Crafts a prompt for a coding AI agent to help debug a generic bug.
+
+*   **Example:**
+    ```bash
+    inkspect optimize --style code-debug --input "My python script is failing with a 'KeyError' when I try to access a dictionary key that should exist."
+    ```
+*   **Sample Output:**
+    > **Prompt for AI Agent:**
+    >
+    > I'm encountering a `KeyError` in my Python script when accessing a dictionary key that I expect to be present. Here is the relevant code snippet:
+    >
+    > ```python
+    > # ... (user would paste their code here) ...
+    > ```
+    >
+    > Please perform the following tasks:
+    >
+    > 1.  **Diagnose Potential Causes:**
+    >     *   Is the key being misspelled?
+    >     *   Is the dictionary being modified or overwritten before the key is accessed?
+    >     *   Is there a case sensitivity issue (e.g., 'key' vs 'Key')?
+    >     *   Could the data source for the dictionary be missing the key?
+    >
+    > 2.  **Propose Fixes:**
+    >     *   Show how to print the dictionary keys right before the access attempt to verify its contents.
+    >     *   Suggest using the `.get()` method with a default value to avoid the `KeyError`.
+    >     *   Provide a code snippet demonstrating a check for the key's existence before accessing it.
+    >
+    > 3.  **Explain the Problem:**
+    >     *   Briefly explain what a `KeyError` is and why it occurs in Python.

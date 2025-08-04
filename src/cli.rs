@@ -40,6 +40,10 @@ pub enum Commands {
         #[arg(short, long)]
         style: Option<String>,
 
+        /// The prompt to use
+        #[arg(long)]
+        prompt: Option<String>,
+
         /// The output file
         #[arg(short, long)]
         output: Option<String>,
@@ -54,10 +58,14 @@ pub enum Commands {
         #[arg(short, long)]
         provider: Option<String>,
     },
-    /// List available styles
-    ListStyles,
+    /// List available prompts
+    ListPrompts,
     /// Run the initial setup to create a configuration file
-    Setup,
+    Setup {
+        /// The config file to create
+        #[arg(long)]
+        config: Option<String>,
+    },
 }
 
 #[cfg(test)]

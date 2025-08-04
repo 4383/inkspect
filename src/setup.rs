@@ -2,14 +2,19 @@ use crate::config::Config;
 use anyhow::Result;
 use console::style;
 use std::io::{self, Write};
+use std::path::PathBuf;
 
-pub fn setup() -> Result<()> {
+pub fn setup(config_path_opt: Option<String>) -> Result<()> {
     println!(
         "{}",
         style("Inkspect Configuration Setup").bold().underlined()
     );
 
-    let config_path = confy::get_configuration_file_path("inkspect", None)?;
+    let config_path = match config_path_opt {
+        Some(path) => PathBuf::from(path),
+        None => confy::get_configuration_file_path("inkspect", None)?,
+    };
+
     println!(
         "This will create a new configuration file at: {}",
         style(config_path.display()).cyan()

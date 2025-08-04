@@ -18,8 +18,8 @@ use log::LevelFilter;
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    if let Commands::Setup = cli.command {
-        return setup::setup();
+    if let Commands::Setup { config } = cli.command {
+        return setup::setup(config);
     }
 
     env_logger::Builder::new()
@@ -79,14 +79,14 @@ async fn main() -> Result<()> {
                 _ => return Err(anyhow::anyhow!("Unsupported provider")),
             }
         }
-        Commands::ListStyles => {
-            // The ListStyles command does not require a provider.
+        Commands::ListPrompts => {
+            // The ListPrompts command does not require a provider.
             Box::new(llm::gemini::GeminiBackend::new(
                 "".to_string(),
                 "".to_string(),
             ))
         }
-        Commands::Setup => unreachable!(), // This is handled above
+        Commands::Setup { .. } => unreachable!(), // This is handled above
     };
 
     core::run(cli, config, llm_backend).await

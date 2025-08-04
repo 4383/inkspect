@@ -12,14 +12,24 @@ pub async fn run(cli: Cli, config: Config, llm_backend: Box<dyn LlmBackend>) -> 
             input,
             editor,
             style,
+            prompt: dynamic_prompt,
             output,
             no_system_prompt,
             ..
         } => {
-            let style_key = style.as_deref().unwrap_or(&config.llm.default_prompt);
-            let style_text = config.prompts.get(style_key).ok_or_else(|| {
-                anyhow::anyhow!("Prompt style '{}' not found in configuration.", style_key)
-            })?;
+            let style_text = if let Some(p) = dynamic_prompt {
+                p
+            } else {
+                let style_key = style.as_deref().unwrap_or(&config.llm.default_prompt);
+                let prompt_style = config
+                    .prompts
+                    .iter()
+                    .find(|p| p.name == style_key)
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Prompt style '{}' not found in configuration.", style_key)
+                    })?;
+                prompt_style.prompt.clone()
+            };
 
             let prompt = if let Some(input) = input {
                 input
@@ -122,18 +132,20 @@ pub async fn run(cli: Cli, config: Config, llm_backend: Box<dyn LlmBackend>) -> 
                 println!("{}", model);
             }
         }
-        Commands::ListStyles => {
-            println!("{}", style("Available Prompt Styles").bold().underlined());
+        Commands::ListPrompts => {
+            println!("{}", style("Available Prompts").bold().underlined());
 
-            let mut prompts: Vec<_> = config.prompts.iter().collect();
-            prompts.sort_by_key(|(name, _)| *name);
+            let mut prompts = config.prompts.clone();
+            prompts.sort_by_key(|p| p.name.clone());
 
-            for (name, description) in prompts {
-                println!("\n{}", style(name).bold().cyan());
-                println!("  {}", description);
+            for prompt in prompts {
+                println!("\n{}", style(prompt.name).bold().cyan());
+                if let Some(description) = prompt.description {
+                    println!("  {}", description);
+                }
             }
         }
-        Commands::Setup => unreachable!(),
+        Commands::Setup { .. } => unreachable!(),
     }
     Ok(())
 }
