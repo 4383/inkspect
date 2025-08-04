@@ -149,9 +149,10 @@ mod tests {
 
     #[test]
     fn test_fallback_to_default() {
-        let path = "non_existent_config_file.toml";
-        let config: Config = confy::load_path(path).unwrap();
-        assert_eq!(config.llm.provider, "gemini");
+        let temp_dir = tempfile::tempdir().unwrap();
+        let path = temp_dir.path().join("non_existent_config_file.toml");
+        let config: Config = confy::load_path(&path).unwrap();
+        assert_eq!(config.llm.provider, "claude");
         assert_eq!(config.llm.default_prompt, "code-spec");
     }
 }
