@@ -58,6 +58,7 @@ impl LlmBackend for ClaudeBackend {
             .client
             .post(&full_url)
             .header("x-api-key", &self.api_key)
+            .header("anthropic-version", "2023-06-01")
             .header("User-Agent", "inkspect/0.1.0")
             .json(&request_body)
             .send()
@@ -67,7 +68,19 @@ impl LlmBackend for ClaudeBackend {
             return Err(anyhow::anyhow!("Empty response from Claude API"));
         }
         log::debug!("Claude API response: {}", response_text);
-        let claude_response: ClaudeResponse = serde_json::from_str(&response_text)?;
+
+        let json_value: serde_json::Value = serde_json::from_str(&response_text)?;
+
+        if let Some(error) = json_value.get("error") {
+            if let Some(message) = error.get("message") {
+                return Err(anyhow::anyhow!(
+                    "Claude API Error: {}",
+                    message.as_str().unwrap_or("Unknown error")
+                ));
+            }
+        }
+
+        let claude_response: ClaudeResponse = serde_json::from_value(json_value)?;
         Ok(claude_response.completion)
     }
 
@@ -97,7 +110,7 @@ mod tests {
             server.url(),
             "claude-2".to_string(),
         );
-        let response = backend.request("test prompt", "refine").await.unwrap();
+        let response = backend.request("test prompt").await.unwrap();
         assert_eq!(response, "Mocked Claude response");
         mock.assert_async().await;
     }

@@ -46,14 +46,14 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             llm: Llm {
-                provider: "gemini".to_string(),
+                provider: "claude".to_string(),
                 default_prompt: "code-spec".to_string(),
                 system_prompt: Some("You are an expert providing a direct and comprehensive answer. Your response should be direct, containing only the answer itself without any introductory remarks, conversational filler, or concluding statements. Do not add a summary or any closing comments. Get straight to the point.".to_string()),
             },
             providers: Providers {
                 gemini: Provider {
                     api_key: "GEMINI_API_KEY".to_string(),
-                    model: "models/gemini-1.5-pro-latest".to_string(),
+                    model: "models/gemini-1.5-flash-latest".to_string(),
                 },
                 claude: Provider {
                     api_key: "CLAUDE_API_KEY".to_string(),
@@ -109,6 +109,7 @@ mod tests {
     #[derive(serde::Serialize)]
     struct TestProvider {
         api_key: String,
+        model: String,
     }
 
     #[test]
@@ -122,9 +123,11 @@ mod tests {
             providers: TestProvidersConfig {
                 gemini: TestProvider {
                     api_key: "GEMINI_API_KEY".to_string(),
+                    model: "gemini-pro".to_string(),
                 },
                 claude: TestProvider {
                     api_key: "CLAUDE_API_KEY".to_string(),
+                    model: "claude-2".to_string(),
                 },
             },
             prompts: vec![Prompt {
@@ -149,6 +152,6 @@ mod tests {
         let path = "non_existent_config_file.toml";
         let config: Config = confy::load_path(path).unwrap();
         assert_eq!(config.llm.provider, "gemini");
-        assert_eq!(config.llm.default_prompt, "refine");
+        assert_eq!(config.llm.default_prompt, "code-spec");
     }
 }

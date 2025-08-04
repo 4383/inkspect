@@ -189,8 +189,8 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_run_list_styles() {
-        let cli = Cli::parse_from(vec!["inkspect", "list-styles"]);
+    async fn test_run_list_prompts() {
+        let cli = Cli::parse_from(vec!["inkspect", "list-prompts"]);
         let config = Config::default();
         let llm_backend = Box::new(MockLlmBackend);
         let result = run(cli, config, llm_backend).await;

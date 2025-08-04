@@ -147,9 +147,9 @@ mod tests {
     }
 
     #[test]
-    fn test_cli_parsing_list_styles_command() {
-        let args = vec!["inkspect", "list-styles"];
+    fn test_cli_parsing_list_prompts_command() {
+        let args = vec!["inkspect", "list-prompts"];
         let cli = Cli::parse_from(args);
-        assert!(matches!(cli.command, Commands::ListStyles));
+        assert!(matches!(cli.command, Commands::ListPrompts));
     }
 }

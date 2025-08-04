@@ -52,8 +52,8 @@ async fn main() -> Result<()> {
 
     let llm_backend: Box<dyn LlmBackend> = match &cli.command {
         Commands::Optimize { provider, .. } => {
-            let provider = provider.as_deref().unwrap_or(&config.llm.provider);
-            match provider {
+            let provider_name = provider.as_deref().unwrap_or(&config.llm.provider);
+            match provider_name {
                 "gemini" => Box::new(GeminiBackend::new(
                     config.providers.gemini.api_key.clone(),
                     config.providers.gemini.model.clone(),
@@ -66,8 +66,8 @@ async fn main() -> Result<()> {
             }
         }
         Commands::ListModels { provider } => {
-            let provider = provider.as_deref().unwrap_or(&config.llm.provider);
-            match provider {
+            let provider_name = provider.as_deref().unwrap_or(&config.llm.provider);
+            match provider_name {
                 "gemini" => Box::new(GeminiBackend::new(
                     config.providers.gemini.api_key.clone(),
                     config.providers.gemini.model.clone(),
@@ -81,10 +81,18 @@ async fn main() -> Result<()> {
         }
         Commands::ListPrompts => {
             // The ListPrompts command does not require a provider.
-            Box::new(llm::gemini::GeminiBackend::new(
-                "".to_string(),
-                "".to_string(),
-            ))
+            let provider_name = &config.llm.provider;
+            match provider_name.as_str() {
+                "gemini" => Box::new(GeminiBackend::new(
+                    config.providers.gemini.api_key.clone(),
+                    config.providers.gemini.model.clone(),
+                )),
+                "claude" => Box::new(ClaudeBackend::new(
+                    config.providers.claude.api_key.clone(),
+                    config.providers.claude.model.clone(),
+                )),
+                _ => return Err(anyhow::anyhow!("Unsupported provider")),
+            }
         }
         Commands::Setup { .. } => unreachable!(), // This is handled above
     };

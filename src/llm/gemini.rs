@@ -77,7 +77,7 @@ impl GeminiBackend {
 impl LlmBackend for GeminiBackend {
     async fn request(&self, full_prompt: &str) -> Result<String> {
         let full_url = format!(
-            "{}/v1/{}:generateContent?key={}",
+            "{}/v1beta/{}:generateContent?key={}",
             self.url, self.model, self.api_key
         );
 
@@ -119,7 +119,19 @@ impl LlmBackend for GeminiBackend {
             return Err(anyhow::anyhow!("Empty response from Gemini API"));
         }
         log::debug!("Gemini API response: {}", response_text);
-        let gemini_response: GeminiResponse = serde_json::from_str(&response_text)?;
+
+        let json_value: serde_json::Value = serde_json::from_str(&response_text)?;
+
+        if let Some(error) = json_value.get("error") {
+            if let Some(message) = error.get("message") {
+                return Err(anyhow::anyhow!(
+                    "Gemini API Error: {}",
+                    message.as_str().unwrap_or("Unknown error")
+                ));
+            }
+        }
+
+        let gemini_response: GeminiResponse = serde_json::from_value(json_value)?;
         Ok(gemini_response.candidates[0].content.parts[0].text.clone())
     }
 
@@ -154,7 +166,7 @@ mod tests {
         let mock = server
             .mock(
                 "POST",
-                "/v1beta/models/gemini-2.5-pro:generateContent?key=test_api_key",
+                "/v1beta/gemini-2.5-pro:generateContent?key=test_api_key",
             )
             .with_status(200)
             .with_header("content-type", "application/json")
@@ -169,7 +181,7 @@ mod tests {
             server.url(),
             "gemini-2.5-pro".to_string(),
         );
-        let response = backend.request("test prompt", "refine").await.unwrap();
+        let response = backend.request("test prompt").await.unwrap();
         assert_eq!(response, "Mocked Gemini response");
         mock.assert_async().await;
     }
