@@ -24,7 +24,8 @@ This constant context-switching between your browser, your editor, and your term
 ## Features
 
 *   **Multiple LLM Backends:** Supports Gemini (default) and Claude.
-*   **Flexible Input:** Provide input via a command-line flag or your favorite text editor.
+*   **Flexible Input:** Provide input via command-line flag, from existing files, or your favorite text editor.
+*   **File Processing:** Read from existing files and optionally update them in-place with optimized output.
 *   **Powerful Prompt Styles:** Use pre-defined prompt styles to get the exact output you need, from refining text to generating code.
 *   **Intelligent Prompting:** A global system prompt ensures LLM outputs are direct and clean, with an option to disable it for full control.
 *   **Customizable:** Configure API keys, default providers, and custom prompt styles in a simple TOML file.
@@ -90,9 +91,23 @@ This is the main command for processing text with an LLM.
     inkspect optimize --input "your prompt here"
     ```
 
+*   **From an Existing File:**
+    ```bash
+    inkspect optimize --file my_prompt.txt
+    ```
+    This reads the content of `my_prompt.txt` as input and outputs the optimized result to stdout.
+
+*   **Update a File In-Place:**
+    ```bash
+    inkspect optimize --file my_document.txt --in-place
+    ```
+    This reads from `my_document.txt`, processes it with the LLM, and updates the same file with the optimized output.
+
 *   **Saving to a File:**
     ```bash
     inkspect optimize --input "your prompt here" --output my_file.txt
+    # or from a file
+    inkspect optimize --file input.txt --output output.txt
     ```
 
 #### `list-prompts`
@@ -119,6 +134,57 @@ Runs the interactive setup to create your configuration file.
 inkspect setup
 ```
 
+### File Input and Output Options
+
+The `optimize` command supports several options for handling file input and output:
+
+#### Input Options
+
+- `--input <text>`: Provide text directly as a command-line argument
+- `--file <path>`: Read input from an existing file
+- No input flag: Opens your default editor for input (uses `$EDITOR` environment variable)
+
+**Note:** You cannot use both `--input` and `--file` at the same time.
+
+#### Output Options
+
+- `--output <path>`: Save the optimized result to a specific file
+- `--in-place`: Update the input file with the optimized output (requires `--file`)
+- No output flag: Display the result on stdout
+
+#### Priority Order
+
+When multiple output options are specified, they are handled in this order:
+1. `--output` takes highest priority (saves to specified file)
+2. `--in-place` updates the input file (only works with `--file`)
+3. Default: output to stdout
+
+#### Examples
+
+```bash
+# Read from a file and display result
+inkspect optimize --file my_draft.md
+
+# Read from a file and update it in-place
+inkspect optimize --file my_draft.md --in-place
+
+# Read from a file and save to another file
+inkspect optimize --file draft.md --output final.md
+
+# Use with different prompt styles
+inkspect optimize --file code_request.txt --style code-spec --in-place
+
+# Combine with other options
+inkspect optimize --file my_prompt.txt --provider claude --style refine --in-place
+```
+
+#### Error Handling
+
+The tool provides helpful error messages for invalid combinations:
+- Using both `--input` and `--file` will show an error
+- Using `--in-place` without `--file` will show an error
+- If the input file doesn't exist or can't be read, a descriptive error is shown
+
 ## Piping and Integration
 
 `inkspect` is a standard command-line application, which means it can be seamlessly integrated into your existing scripts and workflows using pipes. You can chain the output of `inkspect` into other tools for further processing.
@@ -133,6 +199,15 @@ Then, we'll pipe that specification directly to the official Google `gemini-cli`
 ```bash
 # Generate the spec with inkspect and pipe it directly to the gemini-cli agent
 inkspect optimize --style code-spec --input "create a python script to fetch and display the weather for a given city" -o specs.md && gemini -p "execute the @specs.md file"
+```
+
+You can also work with existing files and create iterative workflows:
+
+```bash
+# Start with a rough idea in a file, refine it iteratively
+echo "Create a web scraper for news articles" > idea.txt
+inkspect optimize --file idea.txt --style code-spec --in-place
+inkspect optimize --file idea.txt --style code-gen --output implementation.py
 ```
 
 This workflow allows you to use `inkspect` as a powerful "front-end" for generating high-quality, structured prompts for other automated systems, all from the comfort of your terminal.

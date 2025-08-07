@@ -28,6 +28,10 @@ pub enum Commands {
         #[arg(short, long)]
         input: Option<String>,
 
+        /// Path to a file to use as input
+        #[arg(short, long)]
+        file: Option<String>,
+
         /// The editor to use for input
         #[arg(short, long)]
         editor: Option<String>,
@@ -47,6 +51,10 @@ pub enum Commands {
         /// The output file
         #[arg(short, long)]
         output: Option<String>,
+
+        /// Update the input file in-place with the optimized output
+        #[arg(long)]
+        in_place: bool,
 
         /// Disable the system prompt
         #[arg(long)]
@@ -151,5 +159,42 @@ mod tests {
         let args = vec!["inkspect", "list-prompts"];
         let cli = Cli::parse_from(args);
         assert!(matches!(cli.command, Commands::ListPrompts));
+    }
+
+    #[test]
+    fn test_cli_parsing_file() {
+        let args = vec!["inkspect", "optimize", "--file", "input.txt"];
+        let cli = Cli::parse_from(args);
+        match cli.command {
+            Commands::Optimize { file, .. } => {
+                assert_eq!(file, Some("input.txt".to_string()));
+            }
+            _ => panic!("Expected Optimize command"),
+        }
+    }
+
+    #[test]
+    fn test_cli_parsing_in_place() {
+        let args = vec!["inkspect", "optimize", "--in-place"];
+        let cli = Cli::parse_from(args);
+        match cli.command {
+            Commands::Optimize { in_place, .. } => {
+                assert!(in_place);
+            }
+            _ => panic!("Expected Optimize command"),
+        }
+    }
+
+    #[test]
+    fn test_cli_parsing_file_and_in_place() {
+        let args = vec!["inkspect", "optimize", "--file", "input.txt", "--in-place"];
+        let cli = Cli::parse_from(args);
+        match cli.command {
+            Commands::Optimize { file, in_place, .. } => {
+                assert_eq!(file, Some("input.txt".to_string()));
+                assert!(in_place);
+            }
+            _ => panic!("Expected Optimize command"),
+        }
     }
 }
